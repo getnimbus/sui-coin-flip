@@ -40,7 +40,7 @@ module nimbus::coin_flip {
     /// This function uses arithmetic_is_less_than to determine the coin head or tail in a way that consumes the same
     /// amount of gas regardless of the value of the random number.
     /// randomness signature can be gotten from https://drand.cloudflare.com/52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971/public/<round>
-    entry fun flip(round: &mut Round, user_input: u64, drand_sig: vector<u8>): string::String {
+    public fun flip(round: &mut Round, user_input: u64, drand_sig: vector<u8>): string::String {
         assert!(user_input >= 1 && user_input <= 2, EInvalidParams);
 
         // TODO: cannot verify drand sig in mainnet?
