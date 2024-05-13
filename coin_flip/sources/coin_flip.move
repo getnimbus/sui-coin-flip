@@ -40,7 +40,7 @@ module nimbus::coin_flip {
     /// amount of gas regardless of the value of the random number.
     /// randomness signature can be gotten from https://drand.cloudflare.com/52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971/public/<round>
     entry fun flip(round: &mut Round, user_input: u64, drand_sig: vector<u8>): PlayEvent {
-        assert!(user_input >= 1 && user_input <= 2, EInvalidParams);
+        assert!(user_input >= 0 && user_input <= 1, EInvalidParams);
 
         // TODO: cannot verify drand sig in mainnet?
         // verify_drand_signature(drand_sig, round.round);
