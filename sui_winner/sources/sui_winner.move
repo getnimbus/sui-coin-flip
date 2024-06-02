@@ -1,9 +1,7 @@
 #[allow(unused_mut_parameter)]
-module nimbus::coin_flip {
-    use nimbus::drand_lib::{derive_randomness, verify_drand_signature, safe_selection};
+module nimbus::sui_winner {
+    use nimbus::drand_lib::{derive_randomness, safe_selection};
     use sui::event;
-
-    const EInvalidParams: u64 = 0;
 
     public struct Round has key, store {
         id: UID,
@@ -12,10 +10,10 @@ module nimbus::coin_flip {
 
     // ====== Events ======
 
-    /// For when user trigger flip coin
-    public struct PlayEvent has copy, drop {
-        user_input: u64,
-        result: u64
+    // Winner of campaign
+    public struct Winner has copy, drop {
+        prize: u64,
+        winning_number: u64
     }
 
     // ====== Functions ======
@@ -39,25 +37,20 @@ module nimbus::coin_flip {
     /// This function uses arithmetic_is_less_than to determine the coin head or tail in a way that consumes the same
     /// amount of gas regardless of the value of the random number.
     /// randomness signature can be gotten from https://drand.cloudflare.com/52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971/public/<round>
-    entry fun flip(round: &mut Round, user_input: u64, drand_sig: vector<u8>): PlayEvent {
-        assert!(user_input >= 0 && user_input <= 1, EInvalidParams);
-
-        // TODO: cannot verify drand sig in mainnet?
-        // verify_drand_signature(drand_sig, round.round);
-
+    entry fun random(round: &mut Round, prize: u64, drand_sig: vector<u8>): Winner {
         round.round = round.round + 1;
 
         // The randomness is derived from drand_sig by passing it through sha2_256 to make it uniform.
         let digest = derive_randomness(drand_sig);
 
-        let result = safe_selection(2, &digest);
+        let result = safe_selection(18775, &digest);
 
         // return the result to user
-        let play_event = PlayEvent { user_input, result };
+        let winner = Winner { prize: prize, winning_number: result };
 
-        // simply create new type instance and emit it
-        event::emit(play_event);
+        // emit event
+        event::emit(winner);
 
-        play_event
+        winner
     }
 }
